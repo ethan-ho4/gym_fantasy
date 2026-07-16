@@ -1,0 +1,14 @@
+# A string used to distinguish different Supabase projects on the same host
+project_id = "gym_fantasy"
+
+[api]
+enabled = true
+
+[db]
+port = 54322
+
+[functions.weekly-finalize]
+verify_jwt = false
+
+[functions.season-rollover]
+verify_jwt = false
