@@ -13,6 +13,7 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
@@ -25,6 +26,7 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
 
 # macOS
 .DS_Store
@@ -35,6 +37,16 @@ yarn-error.*
 .env.*
 !.env.example
 .env*.local
+
+# local IDE and agent state
+.cursor/
+.claude/settings.local.json
+
+# Supabase local state and secrets
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+supabase/.env.*
 
 # typescript
 *.tsbuildinfo

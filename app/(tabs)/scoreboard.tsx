@@ -123,10 +123,10 @@ export default function ScoreboardScreen() {
         feed.map((item) => (
           <View key={item.id} style={styles.feedItem}>
             <Text style={styles.feedTitle}>
-              {item.exercise_name} · {item.reps} reps
+              {item.exercise_name} · {item.sets} sets × {item.reps_per_set} reps
             </Text>
             <Text style={styles.muted}>
-              {item.points} pts · {formatEastern(item.created_at)}
+              {item.reps} total reps · {item.points} pts · {formatEastern(item.created_at)}
             </Text>
           </View>
         ))

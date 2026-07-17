@@ -74,6 +74,8 @@ create table if not exists public.workouts (
   user_id uuid not null references auth.users (id) on delete cascade,
   matchup_id uuid not null references public.matchups (id) on delete cascade,
   exercise_name text not null,
+  sets integer not null check (sets > 0),
+  reps_per_set integer not null check (reps_per_set > 0),
   reps integer not null check (reps > 0),
   points integer not null default 0,
   created_at timestamptz not null default now()
@@ -249,6 +251,12 @@ begin
     raise exception 'User is not part of this matchup';
   end if;
 
+  if new.sets is null or new.sets <= 0
+    or new.reps_per_set is null or new.reps_per_set <= 0 then
+    raise exception 'Sets and reps per set must be positive whole numbers';
+  end if;
+
+  new.reps := new.sets * new.reps_per_set;
   new.points := new.reps * 5;
   return new;
 end;

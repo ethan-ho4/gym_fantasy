@@ -21,6 +21,7 @@ Fantasy fitness league — weekly head-to-head matchups, 5 points per rep, US Ea
    - Open **SQL Editor**
    - Paste and run [`supabase/migrations/20260716000000_initial_schema.sql`](supabase/migrations/20260716000000_initial_schema.sql)
    - If you already applied the initial schema earlier, also run [`supabase/migrations/20260716000002_unique_display_names.sql`](supabase/migrations/20260716000002_unique_display_names.sql) (unique display names + availability check)
+   - For an existing database, then run [`supabase/migrations/20260717000003_workout_sets.sql`](supabase/migrations/20260717000003_workout_sets.sql) (sets, reps per set, and server-calculated totals)
 
 3. Confirm **Authentication → Sign In / Providers → Email** is enabled.
 

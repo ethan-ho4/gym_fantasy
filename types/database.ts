@@ -110,6 +110,8 @@ export interface Database {
           user_id: string;
           matchup_id: string;
           exercise_name: string;
+          sets: number;
+          reps_per_set: number;
           reps: number;
           points: number;
           created_at: string;
@@ -119,12 +121,16 @@ export interface Database {
           user_id: string;
           matchup_id: string;
           exercise_name: string;
-          reps: number;
+          sets: number;
+          reps_per_set: number;
+          reps?: number;
           points?: number;
           created_at?: string;
         };
         Update: {
           exercise_name?: string;
+          sets?: number;
+          reps_per_set?: number;
           reps?: number;
         };
         Relationships: [];
