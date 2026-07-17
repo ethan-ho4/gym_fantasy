@@ -11,11 +11,16 @@ import {
 import { useActiveMatchup } from '@/hooks/useActiveMatchup';
 import { supabase } from '@/lib/supabase';
 import { formatCountdownToCutoff, formatEastern } from '@/lib/timezone';
-import type { Workout } from '@/types/database';
+import type { Workout, WorkoutSession, WorkoutSet } from '@/types/database';
+
+type WorkoutWithSets = Workout & {
+  workout_sets: WorkoutSet[];
+  workout_sessions: Pick<WorkoutSession, 'weight_unit'> | null;
+};
 
 export default function ScoreboardScreen() {
   const { matchup, loading, refresh } = useActiveMatchup();
-  const [feed, setFeed] = useState<Workout[]>([]);
+  const [feed, setFeed] = useState<WorkoutWithSets[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadFeed = useCallback(async () => {
@@ -26,13 +31,20 @@ export default function ScoreboardScreen() {
 
     const { data } = await supabase
       .from('workouts')
-      .select('*')
+      .select('*, workout_sets(*), workout_sessions(weight_unit)')
       .eq('matchup_id', matchup.matchup_id)
       .eq('user_id', matchup.opponent_id)
       .order('created_at', { ascending: false })
       .limit(10);
 
-    setFeed(data ?? []);
+    const workouts = (data ?? []).map((workout) => ({
+      ...workout,
+      workout_sets: [...workout.workout_sets].sort(
+        (a, b) => a.set_number - b.set_number,
+      ),
+    })) as WorkoutWithSets[];
+
+    setFeed(workouts);
   }, [matchup]);
 
   useEffect(() => {
@@ -122,9 +134,19 @@ export default function ScoreboardScreen() {
       ) : (
         feed.map((item) => (
           <View key={item.id} style={styles.feedItem}>
-            <Text style={styles.feedTitle}>
-              {item.exercise_name} · {item.sets} sets × {item.reps_per_set} reps
-            </Text>
+            <Text style={styles.feedTitle}>{item.exercise_name}</Text>
+            {item.workout_sets.length > 0 ? (
+              item.workout_sets.map((set) => (
+                <Text key={set.id} style={styles.setDetail}>
+                  Set {set.set_number}: {set.weight}{' '}
+                  {item.workout_sessions?.weight_unit ?? 'lb'} × {set.reps} reps
+                </Text>
+              ))
+            ) : (
+              <Text style={styles.setDetail}>
+                {item.sets} sets × {item.reps_per_set ?? item.reps} reps
+              </Text>
+            )}
             <Text style={styles.muted}>
               {item.reps} total reps · {item.points} pts · {formatEastern(item.created_at)}
             </Text>
@@ -175,4 +197,5 @@ const styles = StyleSheet.create({
     borderColor: '#2a3440',
   },
   feedTitle: { color: '#f4f4f0', fontWeight: '600', marginBottom: 4 },
+  setDetail: { color: '#a8b0b8', fontSize: 14, lineHeight: 20 },
 });

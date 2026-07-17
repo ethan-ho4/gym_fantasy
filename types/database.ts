@@ -104,25 +104,47 @@ export interface Database {
         };
         Relationships: [];
       };
-      workouts: {
+      workout_sessions: {
         Row: {
           id: string;
           user_id: string;
           matchup_id: string;
-          exercise_name: string;
-          sets: number;
-          reps_per_set: number;
-          reps: number;
-          points: number;
+          weight_unit: 'lb' | 'kg';
           created_at: string;
         };
         Insert: {
           id?: string;
           user_id: string;
           matchup_id: string;
+          weight_unit: 'lb' | 'kg';
+          created_at?: string;
+        };
+        Update: {
+          weight_unit?: 'lb' | 'kg';
+        };
+        Relationships: [];
+      };
+      workouts: {
+        Row: {
+          id: string;
+          session_id: string | null;
+          user_id: string;
+          matchup_id: string;
           exercise_name: string;
           sets: number;
-          reps_per_set: number;
+          reps_per_set: number | null;
+          reps: number;
+          points: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id?: string | null;
+          user_id: string;
+          matchup_id: string;
+          exercise_name: string;
+          sets: number;
+          reps_per_set?: number | null;
           reps?: number;
           points?: number;
           created_at?: string;
@@ -130,10 +152,49 @@ export interface Database {
         Update: {
           exercise_name?: string;
           sets?: number;
-          reps_per_set?: number;
+          reps_per_set?: number | null;
           reps?: number;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'workouts_session_id_fkey';
+            columns: ['session_id'];
+            isOneToOne: false;
+            referencedRelation: 'workout_sessions';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      workout_sets: {
+        Row: {
+          id: string;
+          workout_id: string;
+          set_number: number;
+          weight: number;
+          reps: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          workout_id: string;
+          set_number: number;
+          weight: number;
+          reps: number;
+          created_at?: string;
+        };
+        Update: {
+          weight?: number;
+          reps?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workout_sets_workout_id_fkey';
+            columns: ['workout_id'];
+            isOneToOne: false;
+            referencedRelation: 'workouts';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
@@ -171,6 +232,14 @@ export interface Database {
         Args: { p_name: string };
         Returns: boolean;
       };
+      submit_workout_session: {
+        Args: {
+          p_matchup_id: string;
+          p_weight_unit: string;
+          p_exercises: Json;
+        };
+        Returns: string;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
@@ -182,5 +251,7 @@ export type Season = Database['public']['Tables']['seasons']['Row'];
 export type Pool = Database['public']['Tables']['pools']['Row'];
 export type PoolMember = Database['public']['Tables']['pool_members']['Row'];
 export type Matchup = Database['public']['Tables']['matchups']['Row'];
+export type WorkoutSession = Database['public']['Tables']['workout_sessions']['Row'];
 export type Workout = Database['public']['Tables']['workouts']['Row'];
+export type WorkoutSet = Database['public']['Tables']['workout_sets']['Row'];
 export type ActiveMatchup = Database['public']['Functions']['get_active_matchup']['Returns'][number];
